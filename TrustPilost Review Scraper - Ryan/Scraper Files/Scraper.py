@@ -141,8 +141,12 @@ while keep_running:
     print(f"Page {page} has been scraped")
     page += 1
 
+# current date in the format of mmddyy 110823
+current_date = datetime.now().strftime("%m%d%y")
+file_name = f"trustpilot_scraper_{current_date}_{business_unit}.json"
+
 # Saving the data in json file
-with open('Review_Scraper.json', 'w') as outfile:
+with open(f'{file_name}', 'w', encoding='utf-8') as outfile:
     json.dump(all_reviews_data, outfile, indent=4)
 
 # Printing the message
