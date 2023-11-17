@@ -109,7 +109,7 @@ while keep_running:
         location = review.get("location")
         stars = review.get("rating")
         user_id = review.get("id")
-        source_url = f"https://www.trustpilot.com/review/{user_id}"
+        source_url = f"https://www.trustpilot.com/reviews/{user_id}"
         title = review.get("title")
         details = review.get("text")
         try:
