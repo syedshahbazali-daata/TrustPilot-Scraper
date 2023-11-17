@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 import sys
+import re
 
 # Enter the url and no of days as arguments
 try:
@@ -13,33 +14,33 @@ except:
     sys.exit(1)
 
 
+def get_build_id():
+    headers = {
+        "authority": "www.trustpilot.com",
+        "accept": "*/*",
+        "accept-language": "en-US,en;q=0.9",
+        "referer": "https://www.trustpilot.com/review/super.com?businessunit=super.com&page=1&sort=recency",
+        "sec-ch-ua-mobile": "?0",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/"
+                      "537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "x-nextjs-data": "1"
+    }
 
-def check_url_code():
-    for i in range(1,9):
-        try:
-            headers = {
-                "authority": "www.trustpilot.com",
-                "accept": "*/*",
-                "accept-language": "en-US,en;q=0.9",
-                "referer": "https://www.trustpilot.com/review/super.com?businessunit=super.com&page=1&sort=recency",
-                "sec-ch-ua-mobile": "?0",
-                "sec-fetch-dest": "empty",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-site": "same-origin",
-                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/"
-                              "537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                "x-nextjs-data": "1"
-            }
+    # Getting the data from the url
+    try:
+        build_id = str(requests.request("GET",
+                                        f"https://www.trustpilot.com/review/super.com",
+                                        headers=headers).text)
 
-            # Getting the data from the url
-            requests.request("GET", f"https://www.trustpilot.com/_next/data/businessunitprofile-consumersite-81{i}6/review/panaceafinancial.com.json?page=2&businessUnit=panaceafinancial.com", headers=headers).json()
+        build_id = re.findall(r"businessunitprofile-consumersite-([^\/]+)", build_id)[0]
+    except:
+        build_id = None
 
+    return build_id
 
-            return i
-        except:
-            pass
-
-    return None
 
 # Function to calculate the days difference
 def days_until_date(input_date):
@@ -63,11 +64,11 @@ try:
 except:
     business_unit = enter_the_url.split('/')[-1]
 
-url_secure_code = check_url_code()
-url = f'https://www.trustpilot.com/_next/data/businessunitprofile-consumersite-81{url_secure_code}6/review/{business_unit}.json'
-
-
-
+build_id_code = get_build_id()
+if build_id_code is None:
+    print("Please contact the developer maybe Security of Trustpilot has been changed")
+    sys.exit(1)
+url = f'https://www.trustpilot.com/_next/data/businessunitprofile-consumersite-{build_id_code}/review/{business_unit}.json'
 
 all_reviews_data = []
 
